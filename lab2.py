@@ -7,10 +7,8 @@ import random
 matrix_size = int(input("Введите количество вершин"))
 num_input_vertices = int(input("Введите количество входных вершин"))
 num_output_vertices = int(input("Введите количество выходных вершин"))
-min_num_intermediate_vertices = 5
 
-def generate_graph(num_input_vertices, num_output_vertices, min_num_intermediate_vertices):
-    matrix_size = num_input_vertices + num_output_vertices + min_num_intermediate_vertices
+def generate_graph(num_input_vertices, num_output_vertices, matrix_size):
     D = [[0 for _ in range(matrix_size)] for _ in range(matrix_size)]
 
     # Создание входных вершин
@@ -51,7 +49,8 @@ def generate_graph(num_input_vertices, num_output_vertices, min_num_intermediate
     return D
 
 
-D = generate_graph(num_input_vertices, num_output_vertices, min_num_intermediate_vertices)
+D = generate_graph(num_input_vertices, num_output_vertices, matrix_size)
+#print(D)
 
 G = nx.Graph()
 
@@ -80,17 +79,20 @@ for i in range(matrix_size):
         if D[i][j] > 0:
             A_ub[i][j] = 1
             A_ub[j][i] = -1
-print(A_ub)
+#print(A_ub)
 
 b_ub = np.zeros(matrix_size)
 
 # Создание целевой функции
 c = np.zeros(matrix_size)
-c[0] = 1
-c[matrix_size - 1] = -1
+for i in range(matrix_size):
+    for j in range(matrix_size):
+        c[i] = D[matrix_size-1][j]
 print(c)
 
 # Решение задачи линейного программирования
-res = linprog(c, A_ub=A_ub, b_ub=b_ub)
+res = linprog(c, A_ub=A_ub, b_ub=b_ub, method='highs')
+sv = res.x
+
 # Вывод максимального потока
-print(res)
+print(sv)
