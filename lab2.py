@@ -60,6 +60,11 @@ c = np.zeros(matrix_size)
 c[0] = 1
 c[matrix_size - 1] = -1
 
+# c = np.zeros(matrix_size)
+# #c[matrix_size-1] = 1
+# for i in range(matrix_size):
+#     c[i] = np.sum(A_ub)
+
 # Решение задачи линейного программирования
 res = linprog(c, A_ub=A_ub, b_ub=b_ub, method='highs')
 sv = res.x
