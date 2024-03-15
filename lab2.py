@@ -41,19 +41,19 @@ for i in range(matrix_size):
 print(edges_num)
 
 #рисование графа +
-# G = nx.DiGraph()
-# for i in range(matrix_size):
-#     G.add_node(i)
-#     for j in range(matrix_size):
-#         if (D1[i, j] > 0):
-#             G.add_edges_from([(i, j)])
-#             G.add_edge(i, j, weight=D[i][j])
-# pos = nx.circular_layout(G)
-# plt.figure(figsize=(8, 8))
-# nx.draw(G, pos, with_labels=True)
-# labels = nx.get_edge_attributes(G, 'weight')
-# nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-# plt.show()
+G = nx.DiGraph()
+for i in range(matrix_size):
+    G.add_node(i)
+    for j in range(matrix_size):
+        if (D1[i, j] > 0):
+            G.add_edges_from([(i, j)])
+            G.add_edge(i, j, weight=D[i][j])
+pos = nx.circular_layout(G)
+plt.figure(figsize=(8, 8))
+nx.draw(G, pos, with_labels=True)
+labels = nx.get_edge_attributes(G, 'weight')
+nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+plt.show()
 
 # Создание целевой функции +
 c = np.zeros((edges_num))
