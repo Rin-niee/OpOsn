@@ -3,29 +3,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import linprog
 
+
 #создание исходной матрицы +
                #1   #2  #3  #4  #5  #6   #7  #8    #9  #10 #11 #12  #13  #14  #15 #16  #17  #18
-D = np.array([[0,   0,  0,  5,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #1
+D = np.array([[0,   0,  0,   5,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #1
               [0,   0,  0,   0, 25,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0],  #2
               [0,   0,  0,   0,  0, 70,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #3
-              [0,   0,  0,   0,  0,  0,  5,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #4
+              [0,   0,  0,   0,  0,  0,   5,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #4
               [0,   0,  0,   0,  0,  0,   0, 25,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #5
               [0,   0,  0,   0,  0,  0,   0,  0,  70,  0,  0,  0,    0,   0,   0,   0,    0,   0], #6
-              [0,   0,  0,   0,  0,  0,   0,  0,   0, 5,  0,  0,    0,   0,   0,   0,    0,   0], #7
+              [0,   0,  0,   0,  0,  0,   0,  0,   0,  5,  0,  0,    0,   0,   0,   0,    0,   0], #7
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0, 25,  0,    0,   0,   0,   0,    0,   0], #8
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0, 70,    0,   0,   0,   0,    0,   0], #9
-              [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,   5,   0,   0,   0,    0,   0], #10
+              [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    5,   0,   0,   0,    0,   0], #10
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,   25,   0,   0,   0,    0,   0], #11
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,   70,   0,   0,   0,    0,   0], #12
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    0,  85,  50,   0,    0,   0], #13
-              [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   35,  50,   0], #14
+              [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,  35,   50,   0], #14
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,   30,  20], #15
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #16
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #17
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0]]) #18
 matrix_size = len(D)
 
-#матрица инцедентности +
+#матрица инцидентности +
 def matrix_incidence(x):
     D1 = np.zeros((matrix_size, matrix_size))
     for i in range(matrix_size):
@@ -36,6 +37,7 @@ def matrix_incidence(x):
                 D1[i, j] = -1
     return D1
 D1 = matrix_incidence(D)
+print("матрица инцидентности", D1)
 
 #подсчет количества ребер и вершин +
 edges_num = 0
@@ -44,13 +46,15 @@ for i in range(matrix_size):
     for j in range(matrix_size):
         if D1[i, j] > 0:
          edges_num = edges_num + 1
+
+
 #рисование графа +
 def GraphDraw(x, x1):
     G = nx.DiGraph()
     for i in range(matrix_size):
         G.add_node(i)
         for j in range(matrix_size):
-            if (x[i, j] > 0):
+            if (x1[i, j] > 0):
                 G.add_edges_from([(i, j)])
                 G.add_edge(i, j, weight=x[i][j])
     return G
@@ -75,13 +79,16 @@ def sinks(x3):
                     c[m] = 1
     return c
 c = sinks(D1)
+print("целевая функция\n", c)
+
+
 #матрица A_eq
 def conservation(x4):
     A_eq = np.zeros((matrix_size, matrix_size)) #создает матрицу смежности, если есть из в i -> j, то 1, наоборот -1
     e = 0
     for j in range(matrix_size):
         for i in range(matrix_size):
-            if (D1[i, j] == 1):
+            if (x4[i, j] == 1):
                 A_eq[i, e] = 1
                 A_eq[j, e] = -1
                 e+=1
@@ -89,6 +96,7 @@ def conservation(x4):
 
 #ограничения
 A_eq = conservation(D1)
+print("матрица A_eq\n", A_eq)
 A_eq1 = A_eq[3:16]
 b_eq = np.zeros(A_eq1.shape[0])
 
@@ -101,7 +109,7 @@ for i in range(matrix_size):
         if (D1[i, j] > 0  & (m < edges_num)):
             m+=1
             b_ub[m] = D[i, j]
-print(b_ub)
+print("ограничения пропускной способности\n", b_ub)
 
 A_ub = np.eye(b_ub.size)
 
@@ -109,10 +117,11 @@ A_ub = np.eye(b_ub.size)
 res = linprog(-c, A_eq=A_eq1, b_eq=b_eq, A_ub=A_ub, b_ub=b_ub, method = "HiGHS")
 print(res)
 r = np.array((res['x']))
-# Вывод максимального потока
-print(r)
 
-#рисование готового графа
+# Вывод максимального потока
+print("Максимальный поток:\n", r)
+
+#рисование итогового графа
 matrix = np.zeros((matrix_size, matrix_size))
 e = 0
 for i in range(matrix_size):
@@ -120,6 +129,7 @@ for i in range(matrix_size):
         if (D1[i, j]==1):
             matrix[i, j] = r[e]
             e+=1
+
 G1 = nx.DiGraph()
 for i in range(matrix_size):
     for j in range(matrix_size):
