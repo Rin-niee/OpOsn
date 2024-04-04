@@ -112,15 +112,18 @@ C = celevaya(pk, cij, N)
 A_eq = []
 
 A_eq3 = [1]*K + [0]*(N **2) + [0] + [-1]*(N - 1) + [0]*(N * (N - 1))
-A_eq4 = np.zeros((1, N**2))
+A_eq4 = [[0] * N ** 2 for i in range(N)]
     for i in range(N):
         for j in range(N):
             if d[i][j] != 0:
                 A_eq4[i][i * N + j] = -1
                 A_eq4[j][i * N + j] = 1
-                N+=1
-
-b_eq = []
+A_eq4 = A_eq4[1: N - 1]
+A_eq11 = [1] * K + [0] * (N ** 2) + ([0] * (N - 1) + [-1]) * N  # = 0 (11)
+A_eq.extend(A_eq3)
+A_eq.extend(A_eq11)
+A_eq.extend(A_eq4)
+b_eq = np.zeros(1, N+1)
 
 
 
