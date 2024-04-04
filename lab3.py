@@ -143,6 +143,7 @@ for j in range(N ** 2):  # (6)
 
 b_ub += list(d.flatten())
 
+res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, integrality=np.ones(K + 2 * N ** 2))
 
 
 
