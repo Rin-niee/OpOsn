@@ -11,12 +11,12 @@ from scipy.optimize import linprog
 # 𝑏=𝑏𝑙
 # 𝑏𝑜𝑢𝑛𝑑𝑠=[𝑧𝑒𝑟𝑜𝑠(1,(𝐾+2𝑁2));[{𝑄𝑘},𝑧𝑒𝑟𝑜𝑠(1,)]]
 
-def reverse(matrix, r1, r2):
-    for row in matrix:
-        row[r1], row[r2] = row[r2], row[r1]
-    for i in range(len(matrix)):
-        matrix[r1][i], matrix[r2][i] = matrix[r2][i], matrix[r1][i]
-    return matrix
+# def reverse(matrix, r1, r2):
+#     for row in matrix:
+#         row[r1], row[r2] = row[r2], row[r1]
+#     for i in range(len(matrix)):
+#         matrix[r1][i], matrix[r2][i] = matrix[r2][i], matrix[r1][i]
+#     return matrix
 
 K = int(input("введите количество типов товаров"))  # количество типов товаров
 L = int(input("введите количество типов сырья")) # количество типов сырья
@@ -49,7 +49,7 @@ D = np.array([[0,  90, 60,   75,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   
               [0,   0,  0,   0,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0]]) #18
 
 #цена перевоза товара из одного пункта в другой
-C = np.array([[0,  10, 5,   7,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #1
+cij = np.array([[0,  10, 5,   7,  0,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #1
               [0,   0,  0,   0, 25,  0,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0],  #2
               [0,   0,  0,   0,  0, 12,   0,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #3
               [0,   0,  0,   0,  0,  0,   7,  0,   0,  0,  0,  0,    0,   0,   0,   0,    0,   0], #4
@@ -80,6 +80,7 @@ def matrix_incidence(x, matrix_size):
                 D1[i, j] = -1
     return D1
 D1 = matrix_incidence(D, matrix_size)
+#рисование графа
 def GraphDraw(x, x1):
     G = nx.DiGraph()
     for i in range(matrix_size):
@@ -96,3 +97,32 @@ def GraphDraw(x, x1):
     plt.show()
     return G
 D1 = GraphDraw(dij, D)
+
+def celevaya(x1, x2, x):
+    C = []
+    c1 = -np.array(x11)
+    c2 = np.reshape(x2, x**2)
+    c3 = np.zeros((x**2))
+    C.extend(c1)
+    C.extend(c2)
+    C.extend(c3)
+    return C
+C = celevaya(pk, cij, N)
+
+A_eq = []
+
+A_eq3 = [1]*K + [0]*(N **2) + [0] + [-1]*(N - 1) + [0]*(N * (N - 1))
+A_eq4 = np.zeros((1, N**2))
+    for i in range(N):
+        for j in range(N):
+            if d[i][j] != 0:
+                A_eq4[i][i * N + j] = -1
+                A_eq4[j][i * N + j] = 1
+                N+=1
+
+b_eq = []
+
+
+
+
+
