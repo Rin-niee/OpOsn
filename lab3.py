@@ -126,6 +126,23 @@ A_eq.extend(A_eq4)
 b_eq = np.zeros(1, N+1)
 
 
+A_ub=[]
+b_ub=[]
+for l in range(L):
+  A_ub.append(list(a[l]) + [0] * 2 * (N ** 2))
+b_ub += list(b)
+for k in range(K):  # (5)
+    A_ub.append([0] * (K + 2 * (N ** 2)))
+    A_ub[-1][k] = 1
+
+b_ub += list(q)
+
+for j in range(N ** 2):  # (6)
+    A_ub.append([0] * (K + 2 * N ** 2))
+    A_ub[-1][K + N ** 2 + j] = 1
+
+b_ub += list(d.flatten())
+
 
 
 
