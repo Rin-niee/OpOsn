@@ -79,7 +79,7 @@ def matrix_incidence(x, matrix_size):
             elif ((x[i, j] == 0) and (x[j, i]!=0)):
                 D1[i, j] = -1
     return D1
-D1 = matrix_incidence(D, matrix_size)
+D1 = matrix_incidence(D, N)
 #рисование графа
 def GraphDraw(x, x1):
     G = nx.DiGraph()
@@ -96,7 +96,7 @@ def GraphDraw(x, x1):
     nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
     plt.show()
     return G
-D1 = GraphDraw(dij, D)
+D1 = GraphDraw(D, N)
 
 def celevaya(x1, x2, x):
     C = []
