@@ -69,7 +69,7 @@ def solution(K, L, N, p, b, a, d, q, c):
     #2
     for l in range(L):
         #есть только x, а лямбды и z нет
-        A_ub.append(list(a[l]) + [0] * 2 * (N ** 2))
+        A_ub.append(list(Alk[l]) + [0] * 2 * (N ** 2))
     b_ub += list(b)
     #5
     for k in range(K):
@@ -84,9 +84,8 @@ def solution(K, L, N, p, b, a, d, q, c):
     #7
     for j in range(N ** 2):
         A_ub.append([0] * (K + 2 * N ** 2))
-        A_ub[-1][K + j] = -1
+        A_ub[-1][K + j] = -10
         A_ub[-1][K + N ** 2 + j] = 1
-
     b_ub += [0] * (N ** 2)
     #9
     for j in range(N ** 2):
@@ -110,18 +109,15 @@ def vs(matrix1, matrix2, matrix3=[]):
         if len(matrix3) > 0:
             label += f' | {matrix3[i, j]}'
         edge_labels[(i, j)] = label
-
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='blue',font_size=7)  # Рисуем подписи на ребрах
     plt.show()
 vs(D, Cij)
 
 # Решаем задачу
 res = solution(K, L, N, Pk, Bl, Alk, D, Qk, Cij)
-a = res.x
-a = a[-2 * (len(Cij) ** 2):-(len(Cij) ** 2):1].reshape(len(D), len(D))
 b = res.x
 b = b[-(len(Cij) ** 2):].reshape(len(Cij), len(Cij))
-print(a, "\n======\n", b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
+print(b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
 
 vs(b, D, Cij)  # Визуализация доставки товаров,  пропускной способности, стоимости перевозки
 
