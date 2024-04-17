@@ -52,7 +52,6 @@ def celevaya(Pkm, Cij, K, M, N):
     C.extend(C34)
     return C
 C = celevaya(Pkm, Cij, K, M, N)
-# print(C)
 A_eq = []
 b_eq = []
 #3, 4, 11, 12
@@ -62,8 +61,8 @@ b_eq = []
 # 𝑏𝑙(𝑚+1)=𝑏𝑙𝑚−∑𝐴𝑙𝑘𝑥𝑘𝑚𝑘+𝛾𝑙𝑚 (12)
 A_eq3 = [1] * (K*M) + [0] * (N ** 2) + [0] + [-1] * (N - 1) + [0] * (N * (N - 1))+ [0] *(L*M)
 #print(A_eq3)
-A_eq4 = [[0] * N ** 2 for i in range(N)] #по принципу задачи 2 <-тут размерность матрицы (как D и Cij, но вектором), цикл вложенный для матрицы этой
-for i in range(N):  #<-этот для нижнего
+A_eq4 = [[0] * N ** 2 for i in range(N)]
+for i in range(N):
     for j in range(N):
         if D[i][j] != 0:
             A_eq4[i][i*N + j] = 1
@@ -71,9 +70,7 @@ for i in range(N):  #<-этот для нижнего
 for i in range(N):
     A_eq4[i] = [0] * (K + N ** 2) + A_eq4[i]
 A_eq4 = A_eq4[1: N - 1]
-#print(A_eq4)
 A_eq11 = [1]*(K*M) + [0]*(N ** 2) + ([0]*(N - 1)+[-1])*N + [0]*(L*M)
-# print(A_eq11)
 A_eq.append(A_eq3)
 A_eq.append(A_eq4)
 A_eq.append(A_eq11)
