@@ -5,9 +5,10 @@ import networkx as nx
 
 K = int(input("введите количество типов товаров"))  # количество типов товаров
 L = int(input("введите количество типов сырья"))
+M = int(input("введите количество дней"))
 N = 12
-Pk = np.random.randint(100, size=(K))
-Bl = np.random.randint(30, size=(K))
+Pkm = np.random.randint(100, size=(K, M))
+Ylm = np.random.randint(50, size=(L, M))
 Alk = np.random.randint(20, size=(K, L))
 Qk = np.random.randint(30, size=(K))
 
@@ -35,11 +36,10 @@ Cij = np.array([[0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
-
-
-def solution(K, L, N, p, b, a, d, q, c):
+# res = [x11,lyam11, z11, b11]
+def solution(K, L, M, N, p, y, a, d, q, c):
             #-p                     reshape(c)      #0(нет z)
-    C = list(np.negative(p)) + list(c.flatten()) + [0]*(N ** 2)
+    C = list(np.negative(p)) + list(c.flatten()) + [0]*(N ** 2)+ list(c.flatten())
     A_eq = []
     b_eq = []
             #K        #лямбды(их нет)   #z,первая строка из 1(reverse), 1 аналогично ноль, потому что туда ничегоне везем
@@ -53,8 +53,8 @@ def solution(K, L, N, p, b, a, d, q, c):
     for i in range(N):  #<-этот для нижнего
         for j in range(N):
             if d[i][j] != 0:
-                A_eq4[i][i*N + j] = -1
-                A_eq4[j][i*N + j] = 1
+                A_eq4[i][i*N + j] = 1
+                A_eq4[j][i*N + j] = -1
 #изменение размерности матрицы A_eg4 согласно размерностям других матриц
     for i in range(N):
         #чтобы удовлетворить размерность матриц, вместо K, лямбд ставятся нули
@@ -94,7 +94,7 @@ def solution(K, L, N, p, b, a, d, q, c):
 
     b_ub += [1] * (N ** 2)
 
-    res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq)
+    res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, integrality=np.ones(K+2*N**2))
     return res
 
 
@@ -114,10 +114,9 @@ def vs(matrix1, matrix2, matrix3=[]):
 vs(D, Cij)
 
 # Решаем задачу
-res = solution(K, L, N, Pk, Bl, Alk, D, Qk, Cij)
+res = solution(K, L, M, N, Pkm, Ylm, Alk, D, Qk, Cij)
 b = res.x
 b = b[-(len(Cij) ** 2):].reshape(len(Cij), len(Cij))
 print(b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
 
 vs(b, D, Cij)  # Визуализация доставки товаров,  пропускной способности, стоимости перевозки
-
