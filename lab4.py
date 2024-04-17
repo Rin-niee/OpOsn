@@ -78,3 +78,53 @@ A_eq.append(A_eq11)
 #2, 5, 6, 7, 9
 A_ub = []
 b_ub = []
+#в условиях перепроверить надо, они  стремные.
+#2
+for l in range(L):
+    A_ub.append(list(Alk[l]) + [0] * 2 * (N ** 2)+[-1]*(L*M))
+b_ub += 0
+#5
+for k in range(K):
+    A_ub.append([1] * (K*M) + [0]*(2 * (N ** 2))) + [0]*(L*M)
+b_ub += list(Qk)
+#6
+for j in range(N ** 2):
+    A_ub.append([0] * (K + 2 * N ** 2))
+    A_ub[-1][K + N ** 2 + j] = 1
+A_ub+=[0]*(M*L)
+b_ub += list(D.flatten())
+#7
+for j in range(N ** 2):
+    A_ub.append([0] * (K + 2 * N ** 2))
+    A_ub[-1][K + j] = -10
+    A_ub[-1][K + N ** 2 + j] = 1
+A_ub+=[0]*(M*L)
+b_ub += [0] * (N ** 2)
+#9
+for j in range(N ** 2):
+    A_ub.append([0] * (K + M*L + 2 * N ** 2))
+    A_ub[-1][K + j] = 1
+
+b_ub += [1] * (N ** 2)
+res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, integrality=np.ones(K+2*N**2))
+# Решаем задачу
+b = res.x
+b = b[-(len(Cij) ** 2):].reshape(len(Cij), len(Cij))
+print(b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
+
+def vs(matrix1, matrix2, matrix3=[]):
+    G = nx.DiGraph(matrix1)
+    pos = nx.spring_layout(G)  # Определяем позиции узлов
+    nx.draw(G, pos, with_labels=True, node_size=700,
+            node_color="lightblue")  # Рисуем граф
+    edge_labels = {}
+    for i, j, w in G.edges(data=True):
+        label = f'{w["weight"] if w["weight"] != 0 else 0} , {matrix2[i, j]}'
+        if len(matrix3) > 0:
+            label += f' | {matrix3[i, j]}'
+        edge_labels[(i, j)] = label
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='blue',font_size=7)  # Рисуем подписи на ребрах
+    plt.show()
+vs(D, Cij)
+
+vs(b, D, Cij)  # Визуализация доставки товаров,  пропускной способности, стоимости перевозки
