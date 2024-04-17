@@ -5,10 +5,9 @@ import networkx as nx
 
 K = int(input("введите количество типов товаров"))  # количество типов товаров
 L = int(input("введите количество типов сырья"))
-M = int(input("введите количество дней"))
 N = 12
-Pkm = np.random.randint(100, size=(K, M))
-Ylm = np.random.randint(50, size=(L, M))
+Pk = np.random.randint(100, size=(K))
+Bl = np.random.randint(30, size=(K))
 Alk = np.random.randint(20, size=(K, L))
 Qk = np.random.randint(30, size=(K))
 
@@ -36,10 +35,11 @@ Cij = np.array([[0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
-# res = [x11,lyam11, z11, b11]
-def solution(K, L, M, N, p, y, a, d, q, c):
+
+
+def solution(K, L, N, p, b, a, d, q, c):
             #-p                     reshape(c)      #0(нет z)
-    C = list(np.negative(p)) + list(c.flatten()) + [0]*(N ** 2)+ list(c.flatten())
+    C = list(np.negative(p)) + list(c.flatten()) + [0]*(N ** 2)
     A_eq = []
     b_eq = []
             #K        #лямбды(их нет)   #z,первая строка из 1(reverse), 1 аналогично ноль, потому что туда ничегоне везем
@@ -114,7 +114,7 @@ def vs(matrix1, matrix2, matrix3=[]):
 vs(D, Cij)
 
 # Решаем задачу
-res = solution(K, L, M, N, Pkm, Ylm, Alk, D, Qk, Cij)
+res = solution(K, L, N, Pk, Bl, Alk, D, Qk, Cij)
 b = res.x
 b = b[-(len(Cij) ** 2):].reshape(len(Cij), len(Cij))
 print(b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
