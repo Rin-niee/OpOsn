@@ -15,9 +15,9 @@ Qk = np.random.randint(30, size=(K)) #спрос товаров типа k
 D = np.array([[0, 90, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               [0, 0, 0, 50, 43, 0, 0, 0, 0, 0, 0, 0],
               [0, 0, 0, 55,  4, 0, 0, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 54, 70, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 0, 0, 90, 78, 0, 0, 0],
+              [0, 0, 0, 0, 0,54, 70, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0,  1, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0,  0,90,78, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 69, 0],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 59, 0],
@@ -52,51 +52,53 @@ def celevaya(Pkm, Cij, K, M, N):
     C.extend(C34)
     return C
 C = celevaya(Pkm, Cij, K, M, N)
-A_eq = []
-b_eq = []
-#3, 4, 11, 12
-# ∑𝑥𝑘𝑚𝑘,𝑚=∑𝑧1𝑗𝑗 (3)
-# ∑𝑧𝑖𝑗𝑗=∑𝑧𝑗𝑖𝑗 (4)
-# ∑𝑧𝑖𝑁𝑖=∑𝑥𝑘𝑚𝑘,𝑚 (11)
-# 𝑏𝑙(𝑚+1)=𝑏𝑙𝑚−∑𝐴𝑙𝑘𝑥𝑘𝑚𝑘+𝛾𝑙𝑚 (12)
-A_eq3 = [1]*(K*M) + [0]*(N**2) + [0] + [-1]*(N-1) + [0]*(N*(N-1)) + [0]*(L*M)
-A_eq.append(A_eq3)
-A_eq4 = [[0] * N ** 2 for i in range(N)]
-A_eq.append(A_eq4)
-for i in range(N):
-    for j in range(N):
-        if D[i][j] != 0:
-            A_eq4[i][i*N + j] = 1
-            A_eq4[j][i*N + j] = -1
-for i in range(N):
-    A_eq4[i] = [0] * (K + N ** 2) + A_eq4[i]
-A_eq4 = A_eq4[1: N - 1]
-A_eq11 = [1]*(K*M) + [0]*(N**2) + ([0]*(N-1)+[-1])*N + [0]*(L*M)
-A_eq.append(A_eq11)
+def A_eqcreate(K, M, N, L, Alk):
+    A_eq = []
+    #3, 4, 11, 12
+    # ∑𝑥𝑘𝑚𝑘,𝑚=∑𝑧1𝑗𝑗 (3)
+    # ∑𝑧𝑖𝑗𝑗=∑𝑧𝑗𝑖𝑗 (4)
+    # ∑𝑧𝑖𝑁𝑖=∑𝑥𝑘𝑚𝑘,𝑚 (11)
+    # 𝑏𝑙(𝑚+1)=𝑏𝑙𝑚−∑𝐴𝑙𝑘𝑥𝑘𝑚𝑘+𝛾𝑙𝑚 (12)
+    A_eq3 = [1]*(K*M) + [0]*(N**2) + [0] + [-1]*(N-1) + [0]*(N*(N-1)) + [0]*(L*M)
+    A_eq.append(A_eq3)
+    A_eq4 = [[0] * N ** 2 for i in range(N)]
+    for i in range(N):
+        for j in range(N):
+            if D[i][j] != 0:
+                A_eq4[i][i*N + j] = 1
+                A_eq4[j][i*N + j] = -1
 
+    for i in range(N):
+        A_eq4[i] = [0] * (K + N ** 2) + A_eq4[i]
+    A_eq4 = A_eq4[1: N - 1]
+    A_eq.append(A_eq4)
+    A_eq11 = [1]*(K*M) + [0]*(N**2) + ([0]*(N-1)+[-1])*N + [0]*(L*M)
+    A_eq.append(A_eq11)
+    A_eq12 = []
+    a1 = [1]*(K*M)
+    a2 = [0]*(N**2) #лямбды
+    a3 = [0]*(N**2) #зет
+    a4 =[0]*(L*M)
+    for l in range(L): #заполняем единичную матрицу Alk c k
+        for m in range(M-1):
+            for k in range(K):
+                a1[k*M+m] = Alk[l][k]
+                a4[l*M+m]=-1
+                a4[l*M+(m-1)]=1
+    A_eq12.extend(a1)
+    A_eq12.extend(a2)
+    A_eq12.extend(a3)
+    A_eq12.extend(a4)
+    A_eq.append(A_eq12)
+    return A_eq
 
-
-#тут должно быть 12 условие, но его украли цыгане, извините
-# 𝑏𝑙(𝑚+1)=𝑏𝑙𝑚−∑𝐴𝑙𝑘𝑥𝑘𝑚𝑘+𝛾𝑙𝑚 (12)
-
-A_eq12 = []
-a1 = [1]*(K*M)
-for i in range(L): #заполняем единичную матрицу Alk c k
-    for j in range(K):
-        a1[i*M+i] = Alk[i][j]
-a2 = [0]*(N**2) #лямбды
-a3 = [0]*(N**2) #зетки
-a4 =[0]*(L*M) 
-for i in L:
-    for j in (M+1):
-        a4[i*M+j]=-1
-        a4[i*M+(j-1)]=1
-A_eq12.extend(a1)
-A_eq12.extend(a2)
-A_eq12.extend(a3)
-A_eq12.extend(a4)
-A_eq.append(A_eq12)
-
+def b_eqcreate(N, Ylm, L, M):
+    b_eq = [0]*(1+N-2+1)
+    b1 = np.reshape(Ylm, L*M)
+    b_eq.extend(b1)
+    return b_eq
+A_eq = A_eqcreate(K, M, N, L, Alk)
+b_eq = b_eqcreate(N, Ylm, L, M)
 A_ub = []
 b_ub = []
 #2
@@ -127,24 +129,24 @@ for j in range(N**2):
 
 b_ub += [1] * (N ** 2)
 
-res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, integrality=np.ones(K+2*N**2))
-
-
-def vs(matrix1, matrix2, matrix3=[]):
-    G = nx.DiGraph(matrix1)
-    pos = nx.spring_layout(G)
-    nx.draw(G, pos, with_labels=True, node_size=900, node_color="lightblue")
-    edge_labels = {}
-    for i, j, w in G.edges(data=True):
-        label = f'{w["weight"] if w["weight"] != 0 else 0} , {matrix2[i, j]}'
-        if len(matrix3) > 0:
-            label += f' | {matrix3[i, j]}'
-        edge_labels[(i, j)] = label
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='blue',font_size=7)  # Рисуем подписи на ребрах
-    plt.show()
-vs(D, Cij)
-b = res.x
-b = b[-(len(Cij) ** 2):].reshape(len(Cij), len(Cij))
-print(b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
-
-vs(b, D, Cij)  # Визуализация доставки товаров,  пропускной способности, стоимости перевозки
+# res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, integrality=np.ones(K+2*N**2))
+#
+#
+# def vs(matrix1, matrix2, matrix3=[]):
+#     G = nx.DiGraph(matrix1)
+#     pos = nx.spring_layout(G)
+#     nx.draw(G, pos, with_labels=True, node_size=900, node_color="lightblue")
+#     edge_labels = {}
+#     for i, j, w in G.edges(data=True):
+#         label = f'{w["weight"] if w["weight"] != 0 else 0} , {matrix2[i, j]}'
+#         if len(matrix3) > 0:
+#             label += f' | {matrix3[i, j]}'
+#         edge_labels[(i, j)] = label
+#     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='blue',font_size=7)  # Рисуем подписи на ребрах
+#     plt.show()
+# vs(D, Cij)
+# b = res.x
+# b = b[-(len(Cij) ** 2):].reshape(len(Cij), len(Cij))
+# print(b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
+#
+# vs(b, D, Cij)  # Визуализация доставки товаров,  пропускной способности, стоимости перевозки
