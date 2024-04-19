@@ -59,9 +59,10 @@ b_eq = []
 # ∑𝑧𝑖𝑗𝑗=∑𝑧𝑗𝑖𝑗 (4)
 # ∑𝑧𝑖𝑁𝑖=∑𝑥𝑘𝑚𝑘,𝑚 (11)
 # 𝑏𝑙(𝑚+1)=𝑏𝑙𝑚−∑𝐴𝑙𝑘𝑥𝑘𝑚𝑘+𝛾𝑙𝑚 (12)
-A_eq3 = [1] * (K*M) + [0] * (N ** 2) + [0] + [-1] * (N - 1) + [0] * (N * (N - 1))+ [0] *(L*M)
-#print(A_eq3)
+A_eq3 = [1]*(K*M) + [0]*(N**2) + [0] + [-1]*(N-1) + [0]*(N*(N-1)) + [0]*(L*M)
+A_eq.append(A_eq3)
 A_eq4 = [[0] * N ** 2 for i in range(N)]
+A_eq.append(A_eq4)
 for i in range(N):
     for j in range(N):
         if D[i][j] != 0:
@@ -70,27 +71,46 @@ for i in range(N):
 for i in range(N):
     A_eq4[i] = [0] * (K + N ** 2) + A_eq4[i]
 A_eq4 = A_eq4[1: N - 1]
-A_eq11 = [1]*(K*M) + [0]*(N ** 2) + ([0]*(N - 1)+[-1])*N + [0]*(L*M)
-A_eq.append(A_eq3)
-A_eq.append(A_eq4)
+A_eq11 = [1]*(K*M) + [0]*(N**2) + ([0]*(N-1)+[-1])*N + [0]*(L*M)
 A_eq.append(A_eq11)
+
+
+
 #тут должно быть 12 условие, но его украли цыгане, извините
-#2, 5, 6, 7, 9
+# 𝑏𝑙(𝑚+1)=𝑏𝑙𝑚−∑𝐴𝑙𝑘𝑥𝑘𝑚𝑘+𝛾𝑙𝑚 (12)
+
+A_eq12 = []
+a1 = [1]*(K*M)
+for i in range(L): #заполняем единичную матрицу Alk c k
+    for j in range(K):
+        a1[i*M+i] = Alk[i][j]
+a2 = [0]*(N**2) #лямбды
+a3 = [0]*(N**2) #зетки
+a4 =[0]*(L*M) 
+for i in L:
+    for j in (M+1):
+        a4[i*M+j]=-1
+        a4[i*M+(j-1)]=1
+A_eq12.extend(a1)
+A_eq12.extend(a2)
+A_eq12.extend(a3)
+A_eq12.extend(a4)
+A_eq.append(A_eq12)
+
 A_ub = []
 b_ub = []
-#в условиях перепроверить надо, они  стремные.
 #2
 for l in range(L):
-    A_ub.append(list(Alk[l]) + [0] * 2 * (N ** 2)+[-1]*(L*M))
+    A_ub.append(list(Alk[l]) + [0]*2*(N**2)+[-1]*(L*M))
 b_ub += 0
 #5
 for k in range(K):
-    A_ub.append([1] * (K*M) + [0]*(2 * (N ** 2))) + [0]*(L*M)
+    A_ub.append([1]*(K*M) + [0]*(2*(N**2)) + [0]*(L*M))
 b_ub += list(Qk)
 #6
-for j in range(N ** 2):
-    A_ub.append([0] * (K + 2 * N ** 2))
-    A_ub[-1][K + N ** 2 + j] = 1
+for j in range(N**2):
+    A_ub.append([0] * (K + 2*N**2))
+    A_ub[-1][K + N**2 + j] = 1
 A_ub+=[0]*(M*L)
 b_ub += list(D.flatten())
 #7
@@ -101,22 +121,19 @@ for j in range(N ** 2):
 A_ub+=[0]*(M*L)
 b_ub += [0] * (N ** 2)
 #9
-for j in range(N ** 2):
-    A_ub.append([0] * (K + M*L + 2 * N ** 2))
+for j in range(N**2):
+    A_ub.append([0] * (K + M*L + 2*N**2))
     A_ub[-1][K + j] = 1
 
 b_ub += [1] * (N ** 2)
+
 res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, integrality=np.ones(K+2*N**2))
-# Решаем задачу
-b = res.x
-b = b[-(len(Cij) ** 2):].reshape(len(Cij), len(Cij))
-print(b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
+
 
 def vs(matrix1, matrix2, matrix3=[]):
     G = nx.DiGraph(matrix1)
-    pos = nx.spring_layout(G)  # Определяем позиции узлов
-    nx.draw(G, pos, with_labels=True, node_size=700,
-            node_color="lightblue")  # Рисуем граф
+    pos = nx.spring_layout(G)
+    nx.draw(G, pos, with_labels=True, node_size=900, node_color="lightblue")
     edge_labels = {}
     for i, j, w in G.edges(data=True):
         label = f'{w["weight"] if w["weight"] != 0 else 0} , {matrix2[i, j]}'
@@ -126,5 +143,8 @@ def vs(matrix1, matrix2, matrix3=[]):
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='blue',font_size=7)  # Рисуем подписи на ребрах
     plt.show()
 vs(D, Cij)
+b = res.x
+b = b[-(len(Cij) ** 2):].reshape(len(Cij), len(Cij))
+print(b, "\nGraph ======\n", D, "\nResolution======\n", res.x)
 
 vs(b, D, Cij)  # Визуализация доставки товаров,  пропускной способности, стоимости перевозки
