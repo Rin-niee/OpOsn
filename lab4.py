@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import math
 
-K = int(input("Ведите количество типов товаров: "))  #количество типов товаров
+K = int(input("Ведите количество типов товаров: "))
 L = int(input("Введите количество типов сырья: "))
 M = int(input("Введите количество дней: "))
 M1 = int(input("Введите количество сырья в первый день: "))
@@ -41,6 +41,7 @@ Cij = np.array([[0, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0],  #0
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])  #11 #<-матрица стоимости перевозок
 
 N=len(D)
+
 # res = [x11,lyam11, z11, b11]
 # 𝑥𝑘𝑚 – объем производства товара типа 𝑘 в день 𝑚;
 # 𝜆𝑖𝑗 – факт перевозки товаров из пункта 𝑖 в 𝑗;
@@ -94,7 +95,6 @@ for l in range(L):
                 b12[l*M+m] = 1
             b12[l*M+(m-1)] = -1
         A_eq12.append(x12 + l12 + z12 + b12)
-print("A_eq12", len(A_eq12))
 
 #создание полной матрицы
 
@@ -165,9 +165,10 @@ b_ub.extend(list(Qk)) #(5)
 print("Матрица b_eq:\n", len(b_ub))
 
 lb = [0]*(K*M + (2*N*N) + L*M)
-ub = list(Qk)*M + [1]*(N*N) + list(np.reshape(D, N*N)) + [10000]*(L*M)
+ub = list(Qk)*M + [1]*(N*N) + list(np.reshape(D, N*N)) + [math.inf]*(L*M)
 bbb = list(zip(lb, ub))
-res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bbb)
+xi = [1]*(K*M)+ [0]*(N*N)+ [0]*(N*N) + [0]*(L*M)
+res = linprog(c=C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bbb, integrality = xi)
 r = res.x
 print(r)
 
@@ -177,7 +178,7 @@ print(r)
 #для транспортного графа
 zij1=[0]*(N*N)
 for i in range(N*N):
-    zij1[i] = r[K*M+N*N+i]
+    zij1[i] = (r[K*M+N*N+i])
 zij = np.array(zij1)
 zij = zij.reshape(N, N)
 print(zij)
@@ -209,7 +210,9 @@ def GraphDraw(x, DD):
 #             zij[10, 11] = zij[i, j]
 
 G = GraphDraw(N, D)
+plt.show()
 G1 = GraphDraw(N, zij)
+plt.show()
 
 #график 4.3
 
